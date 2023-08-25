@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>mvplab-uae.com</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding-top: 40px;
+      text-align: center;
+      overflow: hidden;
+    }
+    .marquee {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      animation: marquee 4s linear infinite;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
+</head>
+<body>
+  <h1>The rocket is on the launchpad !</h1>
+  <img src="rocket.webp" alt="Rocket">
+  <div class="marquee">
+    <h2>Coming soon...</h2>
+  </div>
+</body>
+</html>
