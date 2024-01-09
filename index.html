@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,12 +9,12 @@
         body {
             margin: 0;
             padding: 0;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
+            overflow: auto;
         }
 
         h1 {
@@ -21,16 +22,17 @@
         }
 
         img {
-            width: 80%;
-            max-width: 100%;
+            max-width: 50%; /* Changed to reduce image size */
             height: auto;
         }
     </style>
 </head>
-<body>
-    <img src="openingsoon.png" alt="Opening Soon">
-    <h1>Follow us for more information</h1>
-    <img src="insta.jpg" alt="Instagram QR Code">
-</body>
-</html>
 
+<body>
+    <img src="openingsoon.png">
+    <h1>Follow us for more information</h1>
+    <img src="insta.jpg">
+
+</body>
+
+</html>
