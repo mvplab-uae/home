@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -74,9 +74,90 @@
 <body>
     <div class="container">
         <div class="logo">🚀</div>
-        <h1>Bienvenue</h1>
-        <p>Cliquez sur le bouton ci-dessous pour accéder à MVPLab :</p>
-        <a href="https://mvplab.ae" class="redirect-btn" target="_blank">Visiter MVPLab.ae</a>
+        <h1 id="title">Welcome</h1>
+        <p id="description">Click the button below to access MVPLab:</p>
+        <a href="https://mvplab.ae" class="redirect-btn" target="_blank" id="button">Visit MVPLab.ae</a>
     </div>
+
+    <script>
+        // Détecter la langue du navigateur
+        const userLang = navigator.language || navigator.userLanguage;
+        const lang = userLang.substring(0, 2).toLowerCase();
+
+        // Traductions
+        const translations = {
+            'fr': {
+                title: 'Bienvenue',
+                description: 'Cliquez sur le bouton ci-dessous pour accéder à MVPLab :',
+                button: 'Visiter MVPLab.ae'
+            },
+            'en': {
+                title: 'Welcome',
+                description: 'Click the button below to access MVPLab:',
+                button: 'Visit MVPLab.ae'
+            },
+            'es': {
+                title: 'Bienvenido',
+                description: 'Haga clic en el botón de abajo para acceder a MVPLab:',
+                button: 'Visitar MVPLab.ae'
+            },
+            'de': {
+                title: 'Willkommen',
+                description: 'Klicken Sie auf die Schaltfläche unten, um auf MVPLab zuzugreifen:',
+                button: 'MVPLab.ae besuchen'
+            },
+            'it': {
+                title: 'Benvenuto',
+                description: 'Clicca sul pulsante qui sotto per accedere a MVPLab:',
+                button: 'Visita MVPLab.ae'
+            },
+            'pt': {
+                title: 'Bem-vindo',
+                description: 'Clique no botão abaixo para acessar o MVPLab:',
+                button: 'Visitar MVPLab.ae'
+            },
+            'ar': {
+                title: 'مرحباً',
+                description: 'انقر على الزر أدناه للوصول إلى MVPLab:',
+                button: 'زيارة MVPLab.ae'
+            },
+            'zh': {
+                title: '欢迎',
+                description: '点击下方按钮访问 MVPLab：',
+                button: '访问 MVPLab.ae'
+            },
+            'ja': {
+                title: 'ようこそ',
+                description: '下のボタンをクリックしてMVPLabにアクセス：',
+                button: 'MVPLab.ae を訪問'
+            },
+            'ru': {
+                title: 'Добро пожаловать',
+                description: 'Нажмите кнопку ниже, чтобы получить доступ к MVPLab:',
+                button: 'Посетить MVPLab.ae'
+            },
+            'nl': {
+                title: 'Welkom',
+                description: 'Klik op de knop hieronder om toegang te krijgen tot MVPLab:',
+                button: 'Bezoek MVPLab.ae'
+            }
+        };
+
+        // Utiliser la langue détectée ou anglais par défaut
+        const currentLang = translations[lang] || translations['en'];
+
+        // Mettre à jour le contenu
+        document.getElementById('title').textContent = currentLang.title;
+        document.getElementById('description').textContent = currentLang.description;
+        document.getElementById('button').textContent = currentLang.button;
+
+        // Mettre à jour la langue du document HTML
+        document.documentElement.lang = lang || 'en';
+
+        // Ajuster la direction du texte pour l'arabe
+        if (lang === 'ar') {
+            document.body.style.direction = 'rtl';
+        }
+    </script>
 </body>
 </html>
