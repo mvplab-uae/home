@@ -1,753 +1,82 @@
-import React, { useState } from 'react';
-import { MapPin, Battery, Clock, Star, User, Calendar, CreditCard, ArrowLeft, Check, Navigation, Home, DollarSign, TrendingUp, Settings } from 'lucide-react';
-
-const ShargedApp = () => {
-  const [currentView, setCurrentView] = useState('map');
-  const [selectedCharger, setSelectedCharger] = useState(null);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-  const [showApplePay, setShowApplePay] = useState(false);
-  const [isHost, setIsHost] = useState(false);
-  const [planningData, setPlanningData] = useState({
-    destination: '',
-    date: '',
-    time: '',
-    duration: '2'
-  });
-
-  const chargers = [
-    {
-      id: 1,
-      name: "Silicon Central Mall",
-      location: "Silicon Oasis, Dubai",
-      price: "15.00",
-      rating: 4.87,
-      available: true,
-      type: "Type 2",
-      power: "7.4 kW",
-      availability: "Mon-Fri: 9:00 AM -5:00 PM"
-    },
-    {
-      id: 2,
-      name: "Semmer Villas",
-      location: "Dubai Silicon Oasis",
-      price: "15.00",
-      rating: 4.9,
-      available: true,
-      type: "Type 2",
-      power: "11 kW",
-      availability: "Mon-Fri: 9:00 AM -5:00 PM"
-    }
-  ];
-
-  const timeSlots = [
-    { id: 1, time: "10:00 AM - 12:00 PM", available: true },
-    { id: 2, time: "12:00 PM - 2:00 PM", available: true },
-    { id: 3, time: "2:00 PM - 4:00 PM", available: true }
-  ];
-
-  // NAVIGATION COMPONENT - USED EVERYWHERE
-  const BottomNavigation = () => (
-    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white rounded-t-3xl shadow-2xl z-40">
-      <div className="flex justify-around py-4 px-6">
-        <button 
-          onClick={() => setCurrentView('map')}
-          className={`flex flex-col items-center space-y-1 ${currentView === 'map' ? 'text-blue-500' : 'text-gray-400'}`}>
-          <MapPin size={24} />
-          <span className={`text-xs ${currentView === 'map' ? 'font-medium' : ''}`}>Map</span>
-        </button>
-        <button 
-          onClick={() => setCurrentView('plan')}
-          className={`flex flex-col items-center space-y-1 ${currentView === 'plan' || currentView === 'planResults' ? 'text-purple-500' : 'text-gray-400'}`}>
-          <Navigation size={24} />
-          <span className={`text-xs ${currentView === 'plan' || currentView === 'planResults' ? 'font-medium' : ''}`}>Plan</span>
-        </button>
-        <button 
-          onClick={() => setCurrentView('bookings')}
-          className={`flex flex-col items-center space-y-1 ${currentView === 'bookings' ? 'text-blue-500' : 'text-gray-400'}`}>
-          <Clock size={24} />
-          <span className={`text-xs ${currentView === 'bookings' ? 'font-medium' : ''}`}>History</span>
-        </button>
-        <button 
-          onClick={() => setCurrentView('host')}
-          className={`flex flex-col items-center space-y-1 ${currentView === 'host' || currentView === 'hostSetup' ? 'text-green-500' : 'text-gray-400'}`}>
-          <Home size={24} />
-          <span className={`text-xs ${currentView === 'host' || currentView === 'hostSetup' ? 'font-medium' : ''}`}>Host</span>
-        </button>
-        <button 
-          onClick={() => setCurrentView('profile')}
-          className={`flex flex-col items-center space-y-1 ${currentView === 'profile' ? 'text-blue-500' : 'text-gray-400'}`}>
-          <User size={24} />
-          <span className={`text-xs ${currentView === 'profile' ? 'font-medium' : ''}`}>Account</span>
-        </button>
-      </div>
-    </div>
-  );
-
-  const MapView = () => (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-blue-500 to-teal-500 pb-20">
-      <div className="bg-gradient-to-r from-blue-500 to-teal-500 p-4 pb-6">
-        <div className="flex items-center justify-between text-white">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-              <div className="w-6 h-6 bg-teal-400 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">⚡</span>
-              </div>
-            </div>
-            <span className="text-xl font-bold">Sharged</span>
-          </div>
-        </div>
-        <h1 className="text-white text-2xl font-bold mt-4">Nearby Chargers</h1>
-        <p className="text-blue-100 text-sm">Available & Booked</p>
-      </div>
-
-      <div className="mx-4 mt-4 bg-white bg-opacity-95 rounded-3xl p-2 shadow-lg">
-        <div className="relative rounded-2xl h-64 overflow-hidden bg-gradient-to-br from-green-100 via-blue-50 to-teal-100">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-200 to-green-200 opacity-60"></div>
-          
-          <div className="absolute inset-0">
-            <div className="absolute top-1/3 left-0 right-0 h-1 bg-gray-300 opacity-80"></div>
-            <div className="absolute top-2/3 left-0 right-0 h-1 bg-gray-300 opacity-80"></div>
-            <div className="absolute left-1/4 top-0 bottom-0 w-1 bg-gray-300 opacity-80"></div>
-            <div className="absolute right-1/4 top-0 bottom-0 w-1 bg-gray-300 opacity-80"></div>
-            
-            <div className="absolute top-8 left-8 w-16 h-12 bg-orange-200 rounded-lg opacity-70 flex items-center justify-center">
-              <span className="text-xs font-semibold text-orange-800">Silicon Oasis</span>
-            </div>
-            
-            <div className="absolute top-16 right-8 w-16 h-12 bg-purple-200 rounded-lg opacity-70 flex items-center justify-center">
-              <span className="text-xs font-semibold text-purple-800">Semmer Villas</span>
-            </div>
-            
-            <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 w-20 h-12 bg-blue-200 rounded-lg opacity-70 flex items-center justify-center">
-              <span className="text-xs font-semibold text-blue-800">Central Mall</span>
-            </div>
-            
-            <div className="absolute bottom-6 left-0 right-0 h-6 bg-blue-300 opacity-50 rounded-full"></div>
-            
-            <div className="absolute top-20 left-1/3 w-8 h-8 bg-green-300 rounded-full opacity-60"></div>
-            <div className="absolute bottom-20 right-1/3 w-6 h-6 bg-green-300 rounded-full opacity-60"></div>
-          </div>
-          
-          <div className="absolute inset-0">
-            <div 
-              className="absolute top-12 left-16 w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center shadow-xl cursor-pointer transform hover:scale-110 transition-transform border-3 border-white"
-              onClick={() => setSelectedCharger(chargers[0])}>
-              <span className="text-white text-sm font-bold">⚡</span>
-            </div>
-            <div className="absolute top-24 left-14 bg-white px-2 py-1 rounded-md shadow-lg text-xs font-semibold text-gray-800">
-              Silicon Central
-            </div>
-            
-            <div 
-              className="absolute top-20 right-16 w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center shadow-xl cursor-pointer transform hover:scale-110 transition-transform border-3 border-white"
-              onClick={() => setSelectedCharger(chargers[1])}>
-              <span className="text-white text-sm font-bold">⚡</span>
-            </div>
-            <div className="absolute top-32 right-12 bg-white px-2 py-1 rounded-md shadow-lg text-xs font-semibold text-gray-800">
-              Semmer Villas
-            </div>
-            
-            <div className="absolute top-2 right-2 bg-white bg-opacity-90 rounded-lg p-2 text-xs">
-              <div className="flex items-center space-x-1 mb-1">
-                <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
-                <span className="font-medium text-gray-700">Available</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                <span className="font-medium text-gray-700">Occupied</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <BottomNavigation />
-    </div>
-  );
-
-  const PlanView = () => (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white pb-20">
-      <div className="p-6">
-        <div className="flex items-center mb-8">
-          <button 
-            onClick={() => setCurrentView('map')}
-            className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="text-2xl font-bold">Plan Ahead</h1>
-        </div>
-        
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-4">Schedule your charge</h2>
-          <p className="text-purple-100 text-lg">Find the best spots for your journey</p>
-        </div>
-        
-        <div className="bg-white text-gray-800 rounded-2xl p-6 mb-6">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Destination</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={planningData.destination}
-                  onChange={(e) => setPlanningData({...planningData, destination: e.target.value})}
-                  placeholder="Enter destination or address"
-                  className="w-full p-4 bg-gray-50 rounded-xl border-0 focus:ring-2 focus:ring-purple-500 pl-12"
-                />
-                <MapPin className="absolute left-4 top-4 text-gray-400" size={20} />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Date</label>
-                <input
-                  type="date"
-                  value={planningData.date}
-                  onChange={(e) => setPlanningData({...planningData, date: e.target.value})}
-                  className="w-full p-4 bg-gray-50 rounded-xl border-0 focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Time</label>
-                <input
-                  type="time"
-                  value={planningData.time}
-                  onChange={(e) => setPlanningData({...planningData, time: e.target.value})}
-                  className="w-full p-4 bg-gray-50 rounded-xl border-0 focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Duration (hours)</label>
-              <select
-                value={planningData.duration}
-                onChange={(e) => setPlanningData({...planningData, duration: e.target.value})}
-                className="w-full p-4 bg-gray-50 rounded-xl border-0 focus:ring-2 focus:ring-purple-500">
-                <option value="1">1 hour</option>
-                <option value="2">2 hours</option>
-                <option value="3">3 hours</option>
-                <option value="4">4 hours</option>
-              </select>
-            </div>
-          </div>
-          
-          <button 
-            onClick={() => setCurrentView('planResults')}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 rounded-xl font-bold text-lg mt-6">
-            Find Nearby Chargers
-          </button>
-        </div>
-        
-        <div className="bg-white bg-opacity-10 rounded-2xl p-4">
-          <h3 className="font-bold mb-3">Quick Destinations</h3>
-          <div className="space-y-2">
-            <button 
-              onClick={() => setPlanningData({...planningData, destination: 'Dubai Mall'})}
-              className="w-full text-left p-3 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all">
-              🛍️ Dubai Mall
-            </button>
-            <button 
-              onClick={() => setPlanningData({...planningData, destination: 'Dubai Marina'})}
-              className="w-full text-left p-3 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all">
-              🏖️ Dubai Marina
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      <BottomNavigation />
-    </div>
-  );
-
-  const PlanResultsView = () => {
-    const nearbyChargers = [
-      {
-        id: 1,
-        name: "City Center Parking",
-        location: "0.3 miles from " + (planningData.destination || "destination"),
-        price: "12.00",
-        rating: 4.9,
-        type: "Type 2",
-        power: "22 kW",
-        slots: [
-          { time: "14:00-16:00", available: true },
-          { time: "16:00-18:00", available: true },
-          { time: "18:00-20:00", available: false }
-        ]
-      },
-      {
-        id: 2,
-        name: "Mall Entrance",
-        location: "0.1 miles from " + (planningData.destination || "destination"),
-        price: "18.00",
-        rating: 4.8,
-        type: "CCS",
-        power: "50 kW",
-        slots: [
-          { time: "14:00-16:00", available: false },
-          { time: "16:00-18:00", available: true },
-          { time: "18:00-20:00", available: true }
-        ]
-      }
-    ];
-
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white pb-20">
-        <div className="p-6">
-          <div className="flex items-center mb-6">
-            <button 
-              onClick={() => setCurrentView('plan')}
-              className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
-              <ArrowLeft size={20} />
-            </button>
-            <div>
-              <h1 className="text-xl font-bold">Chargers Near</h1>
-              <p className="text-purple-100 text-sm">{planningData.destination || "Your destination"}</p>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            {nearbyChargers.map((charger) => (
-              <div key={charger.id} className="bg-white text-gray-800 rounded-2xl p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-lg font-bold">{charger.name}</h3>
-                    <p className="text-gray-600 text-sm">{charger.location}</p>
-                    <div className="flex items-center space-x-1 mt-1">
-                      <Star className="text-yellow-400 fill-current" size={14} />
-                      <span className="text-sm font-medium">{charger.rating}</span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-purple-600">AED {charger.price}</p>
-                    <p className="text-xs text-gray-600">per hour</p>
-                  </div>
-                </div>
-                
-                <div className="mb-4">
-                  <p className="text-sm font-semibold text-gray-700 mb-2">Available Slots</p>
-                  <div className="flex space-x-2">
-                    {charger.slots.map((slot, index) => (
-                      <button
-                        key={index}
-                        disabled={!slot.available}
-                        onClick={() => {
-                          setSelectedTimeSlot(slot);
-                          setSelectedCharger(charger);
-                          setShowApplePay(true);
-                        }}
-                        className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                          slot.available 
-                            ? 'bg-green-100 text-green-700 hover:bg-green-200' 
-                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        }`}>
-                        {slot.time}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                <button 
-                  onClick={() => {
-                    setSelectedCharger(charger);
-                    setCurrentView('timeSelection');
-                  }}
-                  className="w-full bg-purple-500 text-white py-3 rounded-xl font-semibold">
-                  Select This Charger
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        <BottomNavigation />
-      </div>
-    );
-  };
-
-  const ProfileView = () => (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-teal-500 text-white pb-20">
-      <div className="p-6">
-        <h1 className="text-3xl font-bold mb-8">Profile</h1>
-        
-        <div className="bg-white text-gray-800 rounded-2xl p-6 mb-6 text-center">
-          <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-teal-500 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
-            AS
-          </div>
-          <h2 className="text-xl font-bold mb-1">Ash Silicon</h2>
-          <p className="text-gray-600 mb-3">ash.silicon@email.com</p>
-          <div className="flex justify-center items-center space-x-1 mb-4">
-            <Star className="text-yellow-400 fill-current" size={16} />
-            <span className="font-medium">4.8</span>
-            <span className="text-gray-600 text-sm">(23 reviews)</span>
-          </div>
-          
-          <div className="bg-gray-50 rounded-xl p-4 mb-4">
-            <h3 className="font-semibold text-gray-800 mb-3">My Vehicle</h3>
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center text-white font-bold">
-                T
-              </div>
-              <div className="text-left">
-                <p className="font-bold text-gray-800">Tesla Model 3</p>
-                <p className="text-sm text-gray-600">Type 2 CCS Connector</p>
-                <p className="text-xs text-teal-600">75 kWh Battery</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <BottomNavigation />
-    </div>
-  );
-
-  const BookingsView = () => (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-teal-500 text-white pb-20">
-      <div className="p-6">
-        <h1 className="text-3xl font-bold mb-8">My Bookings</h1>
-        
-        <div className="space-y-4">
-          <div className="bg-white text-gray-800 rounded-2xl p-6">
-            <div className="flex justify-between items-start mb-3">
-              <h3 className="font-bold text-lg">Silicon Central Mall</h3>
-              <span className="bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-sm font-semibold">
-                Active
-              </span>
-            </div>
-            <p className="text-gray-600 mb-3">Today, 14:00-16:00</p>
-            <div className="flex justify-between items-center">
-              <span className="font-bold text-teal-600 text-xl">50 AED</span>
-              <button className="bg-blue-500 text-white px-6 py-2 rounded-lg font-semibold">
-                View Details
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <BottomNavigation />
-    </div>
-  );
-
-  const HostView = () => (
-    <div className="min-h-screen bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 text-white pb-20">
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Host Dashboard</h1>
-          <button 
-            onClick={() => setIsHost(!isHost)}
-            className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-              isHost ? 'bg-white text-green-600' : 'bg-white bg-opacity-20 text-white'
-            }`}>
-            {isHost ? 'Active Host' : 'Become Host'}
-          </button>
-        </div>
-
-        <div className="bg-white text-gray-800 rounded-3xl p-6 mb-6">
-          <div className="text-center mb-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <DollarSign size={40} className="text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-green-600 mb-2">Total Earnings</h2>
-            <div className="text-4xl font-bold text-gray-800 mb-2">AED 1,247.50</div>
-            <p className="text-gray-600">Since joining as host</p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-green-50 rounded-xl p-4 text-center">
-              <TrendingUp className="text-green-600 mx-auto mb-2" size={24} />
-              <p className="text-sm text-gray-600">This Month</p>
-              <p className="text-xl font-bold text-green-600">AED 342.00</p>
-            </div>
-            <div className="bg-blue-50 rounded-xl p-4 text-center">
-              <Clock className="text-blue-600 mx-auto mb-2" size={24} />
-              <p className="text-sm text-gray-600">Sessions</p>
-              <p className="text-xl font-bold text-blue-600">127</p>
-            </div>
-          </div>
-
-          <div className="bg-gray-50 rounded-xl p-4">
-            <h3 className="font-bold text-gray-800 mb-3">Recent Earnings</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-semibold text-gray-800">Session #127</p>
-                  <p className="text-sm text-gray-600">2 hours • Today 14:00</p>
-                </div>
-                <span className="font-bold text-green-600">+ AED 25.00</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-semibold text-gray-800">Session #126</p>
-                  <p className="text-sm text-gray-600">3 hours • Yesterday 10:00</p>
-                </div>
-                <span className="font-bold text-green-600">+ AED 37.50</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <button 
-            onClick={() => setCurrentView('hostSetup')}
-            className="w-full bg-white text-gray-800 rounded-2xl p-6 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <Settings className="text-green-600" size={24} />
-              </div>
-              <div className="text-left">
-                <h3 className="font-bold text-lg">Charger Settings</h3>
-                <p className="text-gray-600 text-sm">Manage availability & pricing</p>
-              </div>
-            </div>
-            <span className="text-gray-400 text-xl">›</span>
-          </button>
-        </div>
-      </div>
-      
-      <BottomNavigation />
-    </div>
-  );
-
-  const HostSetupView = () => (
-    <div className="min-h-screen bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 text-white pb-20">
-      <div className="p-6">
-        <div className="flex items-center mb-8">
-          <button 
-            onClick={() => setCurrentView('host')}
-            className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="text-2xl font-bold">Charger Setup</h1>
-        </div>
-
-        <div className="bg-white text-gray-800 rounded-2xl p-6 mb-6">
-          <h3 className="text-xl font-bold mb-6">My Charger</h3>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Charger Name</label>
-              <input
-                type="text"
-                defaultValue="Ash's Home Charger"
-                className="w-full p-4 bg-gray-50 rounded-xl border-0 focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Location</label>
-              <input
-                type="text"
-                defaultValue="Villa 123, Semmer Villas, Dubai"
-                className="w-full p-4 bg-gray-50 rounded-xl border-0 focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Price/Hour</label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    defaultValue="12"
-                    className="w-full p-4 bg-gray-50 rounded-xl border-0 focus:ring-2 focus:ring-green-500 pr-16"
-                  />
-                  <span className="absolute right-4 top-4 text-gray-500">AED</span>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Power</label>
-                <select className="w-full p-4 bg-gray-50 rounded-xl border-0 focus:ring-2 focus:ring-green-500">
-                  <option>7.4 kW</option>
-                  <option>11 kW</option>
-                  <option>22 kW</option>
-                </select>
-              </div>
-            </div>
-
-            <button className="w-full bg-green-500 text-white py-4 rounded-xl font-bold text-lg mt-6">
-              Save Changes
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      <BottomNavigation />
-    </div>
-  );
-
-  const ChargerDetailsModal = () => {
-    if (!selectedCharger) return null;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirection vers MVPLab</title>
     
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
-        <div className="bg-gradient-to-br from-purple-500 via-purple-600 to-pink-500 rounded-t-3xl w-full max-w-md text-white">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <button 
-                onClick={() => setSelectedCharger(null)}
-                className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <ArrowLeft size={20} />
-              </button>
-              <h2 className="text-xl font-bold">Charger Details</h2>
-              <div className="w-10"></div>
-            </div>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-            <div className="bg-white text-gray-800 rounded-2xl p-6 mb-6">
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center">
-                  <Check size={14} className="text-white" />
-                </div>
-                <span className="text-teal-600 font-semibold">Available</span>
-              </div>
-              
-              <h3 className="text-xl font-bold mb-2">{selectedCharger.name}</h3>
-              <p className="text-gray-600 mb-4">{selectedCharger.location}</p>
-              
-              <div className="mb-6">
-                <p className="text-sm text-gray-600">Price</p>
-                <p className="text-2xl font-bold text-gray-800">AED {selectedCharger.price}/hr</p>
-              </div>
-              
-              <button 
-                onClick={() => setCurrentView('timeSelection')}
-                className="w-full bg-gradient-to-r from-orange-400 to-orange-500 text-white py-4 rounded-xl font-semibold text-lg shadow-lg">
-                Reserve
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
 
-  const ApplePayModal = () => {
-    if (!showApplePay) return null;
-    
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
-        <div className="bg-white rounded-t-3xl w-full max-w-md">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <button 
-                onClick={() => setShowApplePay(false)}
-                className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                <ArrowLeft size={20} />
-              </button>
-              <h2 className="text-xl font-bold text-gray-800">Payment</h2>
-              <div className="w-10"></div>
-            </div>
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+        }
 
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl">⚡</span>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">Charging Session</h3>
-              <p className="text-gray-600">{selectedCharger?.name}</p>
-            </div>
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
 
-            <div className="bg-gray-50 rounded-2xl p-6 mb-6">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-gray-600">Session Duration</span>
-                <span className="font-semibold">2 hours</span>
-              </div>
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-gray-600">Rate</span>
-                <span className="font-semibold">AED {selectedCharger?.price}/hr</span>
-              </div>
-              <div className="border-t pt-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold">Total</span>
-                  <span className="text-2xl font-bold text-teal-600">
-                    AED {(parseFloat(selectedCharger?.price || 0) * 2).toFixed(2)}
-                  </span>
-                </div>
-              </div>
-            </div>
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
 
-            <div className="space-y-3">
-              <button 
-                onClick={() => {
-                  setShowApplePay(false);
-                  alert('Payment successful!');
-                }}
-                className="w-full bg-black text-white py-4 rounded-xl font-semibold text-lg flex items-center justify-center space-x-2">
-                <span>🍎</span>
-                <span>Pay with Apple Pay</span>
-              </button>
-              
-              <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold text-lg">
-                Pay with Credit Card
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+        .redirect-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
 
-  const TimeSelectionView = () => (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-purple-600 to-pink-500 text-white pb-20">
-      <div className="p-6">
-        <div className="flex items-center mb-8">
-          <button 
-            onClick={() => setCurrentView('map')}
-            className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="text-2xl font-bold">Select a Time</h1>
-        </div>
-        
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold mb-4">Book a charging slot</h2>
-        </div>
-        
-        <div className="bg-white text-gray-800 rounded-2xl p-6">
-          <div className="space-y-3 mb-6">
-            {timeSlots.map((slot) => (
-              <button
-                key={slot.id}
-                onClick={() => setSelectedTimeSlot(slot)}
-                className={`w-full p-4 rounded-xl text-left font-semibold transition-all ${
-                  selectedTimeSlot?.id === slot.id 
-                    ? 'bg-teal-500 text-white' 
-                    : 'bg-blue-50 text-gray-800 hover:bg-blue-100'
-                }`}>
-                {slot.time}
-              </button>
-            ))}
-          </div>
-          
-          <button 
-            onClick={() => setShowApplePay(true)}
-            className="w-full bg-teal-500 text-white py-4 rounded-xl font-bold text-lg">
-            Book Now
-          </button>
-        </div>
-      </div>
-      
-      <BottomNavigation />
+        .redirect-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🚀</div>
+        <h1>Bienvenue</h1>
+        <p>Cliquez sur le bouton ci-dessous pour accéder à MVPLab :</p>
+        <a href="https://mvplab.ae" class="redirect-btn" target="_blank">Visiter MVPLab.ae</a>
     </div>
-  );
-
-  return (
-    <div className="max-w-md mx-auto bg-gray-50 min-h-screen relative overflow-hidden">
-      {currentView === 'map' && <MapView />}
-      {currentView === 'plan' && <PlanView />}
-      {currentView === 'planResults' && <PlanResultsView />}
-      {currentView === 'timeSelection' && <TimeSelectionView />}
-      {currentView === 'bookings' && <BookingsView />}
-      {currentView === 'profile' && <ProfileView />}
-      {currentView === 'host' && <HostView />}
-      {currentView === 'hostSetup' && <HostSetupView />}
-      
-      <ApplePayModal />
-      <ChargerDetailsModal />
-    </div>
-  );
-};
-
-export default ShargedApp;
+</body>
+</html>
